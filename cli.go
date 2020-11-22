@@ -10,7 +10,7 @@ type CLI struct {
 }
 const Usage = `
 	addBlock --data DATA       "add data to blockchain"
-	printChain				   "print all blockchain data"
+	printChain                 "print all blockchain data"
 `
 //接收参数的动作，放在一个函数中
 func (cli *CLI)Run()  {

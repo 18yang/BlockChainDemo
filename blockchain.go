@@ -1,7 +1,7 @@
 package main
 
 import (
-	"BlockChain/bolt"
+	"BlockChainProject/bolt"
 	"log"
 )
 
@@ -17,9 +17,7 @@ const blockChainDb = "blockChain.db"
 const blockBucket  = "blockBucket"
 
 //返回一个链
-func NewBlockChain() *BlockChain {
-	//作为第一个创世块并加入到区块链中
-	genesisBlock := GenesisBlock()
+func NewBlockChain(address string) *BlockChain {
 	//return &BlockChain{
 	//	blocks: []*Block{genesisBlock},
 	//}
@@ -39,6 +37,8 @@ func NewBlockChain() *BlockChain {
 			if err != nil {
 				log.Panic("创建bucket("+blockBucket+")失败")
 			}
+			//作为第一个创世块并加入到区块链中
+			genesisBlock := GenesisBlock(address)
 			//3. 写数据  hash 最为key block大的字节流最为value
 			bucket.Put(genesisBlock.Hash, genesisBlock.Serialize())
 			bucket.Put([]byte("lastHash"), genesisBlock.Hash)
@@ -55,12 +55,13 @@ func NewBlockChain() *BlockChain {
 }
 
 //定义一个创世块
-func GenesisBlock() *Block {
-	return NewBlock("创世块", []byte{})
+func GenesisBlock(address string) *Block {
+	coinbase := NewCoinBaseTX(address,"创世块")
+	return NewBlock([]*Transaction{coinbase}, []byte{})
 }
 
 //5. 添加区块
-func (chain *BlockChain) AddBlock(data string) {
+func (chain *BlockChain) AddBlock(txs []*Transaction) {
 	//获取前区块的哈希
 	db := chain.db  // 获取区块链数据库
 	lastHash := chain.tail
@@ -71,7 +72,7 @@ func (chain *BlockChain) AddBlock(data string) {
 			log.Panic("bucket不应该为空，请检查！")
 		}
 		//b. 添加到区块链数据库中
-		block := NewBlock(data, lastHash)
+		block := NewBlock(txs, lastHash)
 		//写数据  hash 最为key block大的字节流最为value
 		bucket.Put(block.Hash, block.Serialize())
 		bucket.Put([]byte("lastHash"), block.Hash)
