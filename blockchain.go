@@ -133,19 +133,22 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 					UTXO = append(UTXO, output)
 				}
 			}
-			//遍历input ， 找到自己花费过的utxo集合（把自己消耗过的标识出来）
+			//如果当前交易时挖矿交易的话，那么不做遍历
+			if !tx.IsCoinbase() {
 
 
-			for _,input := range tx.TXInputs {
-				//判断一下当前这个input和目标是否一致，如果相同，表示是消耗过的output
-				if input.Sig == address {
-					indexArray := spentOutputs[string(input.TXid)]
-					indexArray = append(indexArray, input.Index)
+				//遍历input ， 找到自己花费过的utxo集合（把自己消耗过的标识出来）
+				for _,input := range tx.TXInputs {
+					//判断一下当前这个input和目标是否一致，如果相同，表示是消耗过的output
+					if input.Sig == address {
+						indexArray := spentOutputs[string(input.TXid)]
+						indexArray = append(indexArray, input.Index)
+					}
 				}
+			}else{
+				fmt.Printf("这是coinbase, 不做遍历\n")
 			}
-
 		}
-
 		if len(block.PrevHash) == 0 {
 			fmt.Println("区块链遍历完成退出")
 			break
@@ -153,6 +156,16 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 	}
 	return UTXO
 }
+
+func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]uint64,float64) {
+	//找到的合理的utxo集合
+	var utxos map[string][]uint64
+	//找到utxos里面包含钱的总数
+	var calculate float64
+	//TODO
+	return utxos,calculate
+}
+
 
 func (bc *BlockChain) Printchain() {
 
