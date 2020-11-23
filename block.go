@@ -21,7 +21,7 @@ type Block struct {
 	//4. 时间戳
 	TimeStamp uint64
 	//5. 难度值
-	Diffculty uint64
+	Difficulty uint64
 	//6. 随机数，挖矿要找的数
 	Nonce uint64
 	//7. 当前区块哈希 正常比特币区块中没有当前区块的哈希，为了方便简化//TODO
@@ -47,7 +47,7 @@ func NewBlock(txs []*Transaction, preBlockHash []byte) *Block {
 		PrevHash:   preBlockHash,
 		MerkelRoot: []byte{},
 		TimeStamp:  uint64(time.Now().Unix()),
-		Diffculty:  0,
+		Difficulty:  0,
 		Nonce:      0,
 		Hash:       []byte{},
 		Transactions: txs,
@@ -83,7 +83,7 @@ func (block *Block) SetHash() {
 		block.PrevHash,
 		block.MerkelRoot,
 		Uint64ToByte(block.TimeStamp),
-		Uint64ToByte(block.Diffculty),
+		Uint64ToByte(block.Difficulty),
 		Uint64ToByte(block.Nonce),
 	}
 	//将二维切片数组链接起来，返回一个一维切片数组

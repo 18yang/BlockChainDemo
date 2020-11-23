@@ -9,8 +9,10 @@ type CLI struct {
 	bc *BlockChain
 }
 const Usage = `
-	addBlock --data DATA       "add data to blockchain"
-	printChain                 "print all blockchain data"
+	addBlock --data DATA       "添加区块"
+	printChain                 "正向打印区块链"
+	printChainR				   "反向打印区块链"
+	getBalance --address ADDRESS "获取指定地址的余额"
 `
 //接收参数的动作，放在一个函数中
 func (cli *CLI)Run()  {
@@ -25,7 +27,7 @@ func (cli *CLI)Run()  {
 	//2. 分析命令
 	cmd := args[1]
 	switch cmd {
-		//3. 执行相应的动作
+	//3. 执行相应的动作
 	case "addBlock":
 		//添加区块
 		fmt.Println("添加区块")
@@ -38,10 +40,19 @@ func (cli *CLI)Run()  {
 			fmt.Println("参数使用不当，请检查！")
 			fmt.Print(Usage)
 		}
-	case "printChain":
-		//打印区块
-		fmt.Println("打印区块")
+	case "printChain" :
+		fmt.Println("正向打印区块链\n")
 		cli.PrintBlockChain()
+	case "printChainR":
+		//打印区块
+		fmt.Println("反向打印区块链")
+		cli.PrintBlockChainReverse()
+	case "getBalance":
+		fmt.Printf("获取余额\n")
+		if len(args) ==4 && args[2] == "--address"  {
+			address := args[3]
+			cli.GetBalance(address)
+		}
 	default:
 		fmt.Printf(Usage)
 	}
