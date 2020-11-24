@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"log"
 )
-const reward = 25
+const reward = 50
 //定义交易结构
 type Transaction struct {
 	TXID []byte  //交易id
@@ -81,12 +81,12 @@ func NewCoinBaseTX(address string,data string) *Transaction{
 }
 //创建普通交易
 func NewTransaction(from, to string,amount float64,bc *BlockChain) *Transaction{
-	//TODO
 	//1. 找到最合理的utxo集合
 	utxos, resValue := bc.FindNeedUTXOs(from,amount)
 
 	if resValue < amount {
 		fmt.Printf("余额不足，交易失败")
+		return nil
 	}
 
 	var inputs []TXInput
