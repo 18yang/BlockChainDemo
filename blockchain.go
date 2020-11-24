@@ -11,12 +11,12 @@ import (
 type BlockChain struct {
 	//定义一个区块链数组
 	//blocks []*Block
-	db *bolt.DB
+	db   *bolt.DB
 	tail []byte //存储最后一个区块的值
 }
 
 const blockChainDb = "blockChain.db"
-const blockBucket  = "blockBucket"
+const blockBucket = "blockBucket"
 
 //返回一个链
 func NewBlockChain(address string) *BlockChain {
@@ -38,7 +38,7 @@ func NewBlockChain(address string) *BlockChain {
 			//没有抽屉，创建
 			bucket, err = tx.CreateBucket([]byte(blockBucket))
 			if err != nil {
-				log.Panic("创建bucket("+blockBucket+")失败")
+				log.Panic("创建bucket(" + blockBucket + ")失败")
 			}
 			//作为第一个创世块并加入到区块链中
 			genesisBlock := GenesisBlock(address)
@@ -46,7 +46,7 @@ func NewBlockChain(address string) *BlockChain {
 			bucket.Put(genesisBlock.Hash, genesisBlock.Serialize())
 			bucket.Put([]byte("lastHash"), genesisBlock.Hash)
 			lastHash = genesisBlock.Hash
-		}else{
+		} else {
 			lastHash = bucket.Get([]byte("lastHash"))
 		}
 		return nil
@@ -59,14 +59,14 @@ func NewBlockChain(address string) *BlockChain {
 
 //定义一个创世块
 func GenesisBlock(address string) *Block {
-	coinbase := NewCoinBaseTX(address,"创世块")
+	coinbase := NewCoinBaseTX(address, "创世块")
 	return NewBlock([]*Transaction{coinbase}, []byte{})
 }
 
 //5. 添加区块
 func (chain *BlockChain) AddBlock(txs []*Transaction) {
 	//获取前区块的哈希
-	db := chain.db  // 获取区块链数据库
+	db := chain.db // 获取区块链数据库
 	lastHash := chain.tail
 	//a. 创建新的区块
 	db.Update(func(tx *bolt.Tx) error {
@@ -86,16 +86,16 @@ func (chain *BlockChain) AddBlock(txs []*Transaction) {
 		return nil
 	})
 
-
 }
 
-func (bc *BlockChain)NewIterator() *BlockChainIterator {
+func (bc *BlockChain) NewIterator() *BlockChainIterator {
 	return &BlockChainIterator{
-		db:                 bc.db,
+		db: bc.db,
 		//最初指向区块链的最后一个区块，随着Next方法，不断变化
 		currentHashPointer: bc.tail,
 	}
 }
+
 //找到指定地址的所有UTXO
 func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 	var UTXO []TXOutput
@@ -104,22 +104,22 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 	spentOutputs := make(map[string][]int64)
 	//创建迭代器
 	it := bc.NewIterator()
-	for   {
+	for {
 		//遍历区块
 		block := it.Next()
 		//遍历交易
-		for _,tx := range block.Transactions {
-			fmt.Printf("current txid: %x\n",tx.TXID)
+		for _, tx := range block.Transactions {
+			//fmt.Printf("current txid: %x\n", tx.TXID)
 
 		OUTPUT:
 			//遍历output， 找到和自己相关的utxo（再添加output之前检查一下自己是否消耗过）
-			for i , output := range tx.TXoutputs {
-				fmt.Printf("current index: %x\n",i)
+			for i, output := range tx.TXoutputs {
+				//fmt.Printf("current index: %x\n", i)
 				//在这里做一个过滤，将所有消耗过的output和当前的所即将添加output对比一下
 				//如果相同，即跳过，否则添加
 				//如果当前的交易id存在于我们已经表示的map，那么说明这个交易是有消耗过的
-				if spentOutputs[string(tx.TXID)] != nil{
-					for _,j := range spentOutputs[string(tx.TXID)]{
+				if spentOutputs[string(tx.TXID)] != nil {
+					for _, j := range spentOutputs[string(tx.TXID)] {
 						if int64(i) == j {
 							//当前准备添加output已经消耗过了
 							continue OUTPUT
@@ -135,28 +135,28 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 			//如果当前交易时挖矿交易的话，那么不做遍历
 			if !tx.IsCoinbase() {
 
-
 				//遍历input ， 找到自己花费过的utxo集合（把自己消耗过的标识出来）
-				for _,input := range tx.TXInputs {
+				for _, input := range tx.TXInputs {
 					//判断一下当前这个input和目标是否一致，如果相同，表示是消耗过的output
 					if input.Sig == address {
+						//请不要用变量存储map，会出现错误：
 						//indexArray := spentOutputs[string(input.TXid)]
 						spentOutputs[string(input.TXid)] = append(spentOutputs[string(input.TXid)], input.Index)
 					}
 				}
-			}else{
-				fmt.Printf("这是coinbase, 不做遍历\n")
+			} else {
+				//fmt.Printf("这是coinbase, 不做遍历\n")
 			}
 		}
 		if len(block.PrevHash) == 0 {
-			fmt.Println("区块链遍历完成退出")
+			//fmt.Println("区块链遍历完成退出")
 			break
 		}
 	}
 	return UTXO
 }
 
-func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]uint64,float64) {
+func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]uint64, float64) {
 	//找到的合理的utxo集合
 	utxos := make(map[string][]uint64)
 	//找到utxos里面包含钱的总数
@@ -166,22 +166,22 @@ func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]u
 	spentOutputs := make(map[string][]int64)
 	//创建迭代器
 	it := bc.NewIterator()
-	for   {
+	for {
 		//遍历区块
 		block := it.Next()
 		//遍历交易
-		for _,tx := range block.Transactions {
+		for _, tx := range block.Transactions {
 			//fmt.Printf("current txid: %x\n",tx.TXID)
 
 		OUTPUT:
 			//遍历output， 找到和自己相关的utxo（再添加output之前检查一下自己是否消耗过）
-			for i , output := range tx.TXoutputs {
+			for i, output := range tx.TXoutputs {
 				//fmt.Printf("current index: %x\n",i)
 				//在这里做一个过滤，将所有消耗过的output和当前的所即将添加output对比一下
 				//如果相同，即跳过，否则添加
 				//如果当前的交易id存在于我们已经表示的map，那么说明这个交易是有消耗过的
-				if spentOutputs[string(tx.TXID)] != nil{
-					for _,j := range spentOutputs[string(tx.TXID)]{
+				if spentOutputs[string(tx.TXID)] != nil {
+					for _, j := range spentOutputs[string(tx.TXID)] {
 						if int64(i) == j {
 							//当前准备添加output已经消耗过了
 							continue OUTPUT
@@ -199,24 +199,27 @@ func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]u
 						//3. 比较一下是否满足转账需求
 						//	a. 满足的话，直接返回，
 						if calculate >= amount {
-							return utxos,calculate
+							fmt.Printf("找到满足转账金额，当前总额：%f\n",calculate)
+							return utxos, calculate
 						}
 						//	b. 不满足继续统计
 
+					}else{
+						fmt.Printf("不满足转账金额，当前总额：%f\n",calculate)
 					}
 				}
 			}
 			//如果当前交易时挖矿交易的话，那么不做遍历
 			if !tx.IsCoinbase() {
 				//遍历input ， 找到自己花费过的utxo集合（把自己消耗过的标识出来）
-				for _,input := range tx.TXInputs {
+				for _, input := range tx.TXInputs {
 					//判断一下当前这个input和目标是否一致，如果相同，表示是消耗过的output
 					if input.Sig == from {
 						//indexArray := spentOutputs[string(input.TXid)]
 						spentOutputs[string(input.TXid)] = append(spentOutputs[string(input.TXid)], input.Index)
 					}
 				}
-			}//else{
+			} //else{
 			//	fmt.Printf("这是coinbase, 不做遍历\n")
 			//}
 		}
@@ -226,9 +229,8 @@ func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]u
 		}
 	}
 
-	return utxos,calculate
+	return utxos, calculate
 }
-
 
 func (bc *BlockChain) Printchain() {
 

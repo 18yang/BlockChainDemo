@@ -20,7 +20,7 @@ func NewProofOfWork(block *Block) *ProofOfWork {
 		block:  block,
 	}
 	//指定的目标值   --->   工作量证明就是为了找到比目标值小的hash数
-	targetStr := "0000f0000000000000000000000000000000000000000000000000000000000"
+	targetStr := "000f00000000000000000000000000000000000000000000000000000000000"
 	tmpInt := big.Int{}//转成 big.int 类型
 	//将目标值赋值给tmpInt 并指定为16进制
 	tmpInt.SetString(targetStr,16)
