@@ -12,12 +12,12 @@ type CLI struct {
 }
 
 const Usage = `
-	printChain  			"正向打印区块链"
+	printChain  			"打印区块链头部"
 	printChainR 			"反向打印区块链"
 	getBalance --address ADDRESS    "获取指定地址的余额"
 	send FROM TO AMOUNT MINER DATA  "由FROM转AMOUNT给TO,由MINER挖矿,同时写入DATA"
 	newWallet   			"创建一个新的钱包(私钥公钥对)"
-	listAddresses "列举所有的钱包地址"
+	listAddresses 			"列举所有的钱包地址"
 `
 
 //接收参数的动作，放在一个函数中

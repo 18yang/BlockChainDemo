@@ -3,11 +3,8 @@ package main
 import "fmt"
 
 func (cli *CLI) PrintBlockChain() {
-	cli.bc.Printchain()
-	fmt.Printf("打印区块链完成\n")
-}
-
-func (cli *CLI) PrintBlockChainReverse() {
+	//cli.bc.Printchain()
+	//fmt.Printf("打印区块链完成\n")
 	chain := cli.bc
 	iterator := chain.NewIterator()
 
@@ -29,7 +26,29 @@ func (cli *CLI) PrintBlockChainReverse() {
 			return
 		}
 	}
+
 }
+
+func (cli *CLI) PrintBlockChainReverse() {
+	bc := cli.bc
+	//创建迭代器
+	it := bc.NewIterator()
+
+	//调用迭代器，返回我们的每一个区块数据
+	for {
+		//返回区块，左移
+		block := it.Next()
+
+		for _, tx := range block.Transactions {
+			fmt.Println(tx)
+		}
+		if len(block.PrevHash) == 0 {
+			fmt.Printf("区块链遍历结束！")
+			break
+		}
+	}
+}
+
 
 func (cli *CLI) GetBalance(address string) {
 	//校验地址是否有效
