@@ -62,7 +62,7 @@ func (cli *CLI) Run() {
 		}
 	case "send":
 		if len(args) != 7 {
-			fmt.Printf("参数个数错误，请检查！")
+			fmt.Printf("参数个数错误，请检查！\n")
 			fmt.Printf(Usage)
 			return
 		}
@@ -74,13 +74,13 @@ func (cli *CLI) Run() {
 		data := args[6]
 		cli.Send(from, to, amount, miner, data)
 	case "newWallet":
-		fmt.Printf("创建新的钱包...")
+		fmt.Printf("创建新的钱包...\n")
 		cli.NewWallet()
 	case "listAddresses":
 		fmt.Printf("列举所有地址...\n")
 		cli.ListAddresses()
 	default:
-		fmt.Printf("输入命令有误，请检查！")
+		fmt.Printf("输入命令有误，请检查！\n")
 		fmt.Printf(Usage)
 	}
 }

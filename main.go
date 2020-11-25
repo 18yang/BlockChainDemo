@@ -1,7 +1,7 @@
 package main
 
 func main() {
-	chain := NewBlockChain("14PxkwD8cTpzNAT1PYXRwK4qRNbkBVtgFP")
+	chain := NewBlockChain("1DFt5fpWHgwDzF6GwAuQn5DKpnFRAktS4D")
 	cli := CLI{chain}
 	cli.Run()
 	//chain.AddBlock("11111111111")
