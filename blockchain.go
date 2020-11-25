@@ -97,7 +97,7 @@ func (bc *BlockChain) NewIterator() *BlockChainIterator {
 }
 
 //找到指定地址的所有UTXO
-func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
+func (bc *BlockChain) FindUTXOs(PubKeyHash []byte) []TXOutput {
 	var UTXO []TXOutput
 	//map[string][]uint64
 	//定义一个map来保存笑给过的output，key是这个output的交易id，value是这个交易中索引的数组
@@ -128,7 +128,7 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 				}
 
 				//这个output和我们目标的地址相同，满足条件，加到返回utxo数组中
-				if output.PukKeyHash == address {
+				if bytes.Equal(PubKeyHash,output.PukKeyHash) {
 					UTXO = append(UTXO, output)
 				}
 			}
@@ -138,7 +138,8 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 				//遍历input ， 找到自己花费过的utxo集合（把自己消耗过的标识出来）
 				for _, input := range tx.TXInputs {
 					//判断一下当前这个input和目标是否一致，如果相同，表示是消耗过的output
-					if input.Sig == address {
+					hashPubKey := HashPubKey(input.PubKey)
+					if bytes.Equal(hashPubKey,PubKeyHash) {
 						//请不要用变量存储map，会出现错误：
 						//indexArray := spentOutputs[string(input.TXid)]
 						spentOutputs[string(input.TXid)] = append(spentOutputs[string(input.TXid)], input.Index)
@@ -156,7 +157,7 @@ func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
 	return UTXO
 }
 
-func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]uint64, float64) {
+func (bc *BlockChain) FindNeedUTXOs(senderPubKeyHash []byte, amount float64) (map[string][]uint64, float64) {
 	//找到的合理的utxo集合
 	utxos := make(map[string][]uint64)
 	//找到utxos里面包含钱的总数
@@ -190,7 +191,7 @@ func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]u
 				}
 
 				//这个output和我们目标的地址相同，满足条件，加到返回utxo数组中
-				if output.PukKeyHash == from {
+				if bytes.Equal(senderPubKeyHash,output.PukKeyHash) {
 					if calculate < amount {
 						//1. 把utxo加进来
 						utxos[string(tx.TXID)] = append(utxos[string(tx.TXID)], uint64(i))
@@ -214,7 +215,8 @@ func (bc *BlockChain) FindNeedUTXOs(from string, amount float64) (map[string][]u
 				//遍历input ， 找到自己花费过的utxo集合（把自己消耗过的标识出来）
 				for _, input := range tx.TXInputs {
 					//判断一下当前这个input和目标是否一致，如果相同，表示是消耗过的output
-					if input.Sig == from {
+					hashPubKey := HashPubKey(input.PubKey)
+					if bytes.Equal(hashPubKey,senderPubKeyHash) {
 						//indexArray := spentOutputs[string(input.TXid)]
 						spentOutputs[string(input.TXid)] = append(spentOutputs[string(input.TXid)], input.Index)
 					}
@@ -256,7 +258,7 @@ func (bc *BlockChain) Printchain() {
 			fmt.Printf("难度值(随便写的）: %d\n", block.Difficulty)
 			fmt.Printf("随机数 : %d\n", block.Nonce)
 			fmt.Printf("当前区块哈希值: %x\n", block.Hash)
-			fmt.Printf("区块数据 :%s\n", block.Transactions[0].TXInputs[0].Sig)
+			fmt.Printf("区块数据 :%s\n", block.Transactions[0].TXInputs[0].PubKey)
 			return nil
 		})
 		return nil

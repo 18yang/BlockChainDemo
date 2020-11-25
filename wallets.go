@@ -1,6 +1,7 @@
 package main
 
 import (
+	"BlockChainProject/base58"
 	"bytes"
 	"crypto/elliptic"
 	"encoding/gob"
@@ -78,4 +79,15 @@ func (ws *Wallets)GetAllAddresses() []string {
 		addresses = append(addresses, address)
 	}
 	return addresses
+}
+//通过地址返回公钥的哈希值
+func GetPubKeyFromAddress(address string) []byte {
+	//1. 解码
+	//2. 截取出公钥哈希：去除version（1字节），去除校验码（4字节）
+	addressByte := base58.Decode(address) //25字节
+	lenth := len(addressByte)
+
+	pubKeyHash := addressByte[1:lenth-4]
+
+	return pubKeyHash
 }
