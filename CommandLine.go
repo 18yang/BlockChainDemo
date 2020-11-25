@@ -30,10 +30,6 @@ func (cli *CLI) PrintBlockChainReverse() {
 		}
 	}
 }
-func (cli *CLI) AddBlock(data string) {
-	//cli.bc.AddBlock(data)//TODO
-	fmt.Printf("添加区块成功！\n")
-}
 
 func (cli *CLI) GetBalance(address string) {
 	//校验地址是否有效

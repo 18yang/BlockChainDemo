@@ -24,7 +24,7 @@ type Block struct {
 	Difficulty uint64
 	//6. 随机数，挖矿要找的数
 	Nonce uint64
-	//7. 当前区块哈希 正常比特币区块中没有当前区块的哈希，为了方便简化//TODO
+	//7. //TODO 当前区块哈希 正常比特币区块中没有当前区块的哈希，为了方便简化
 	Hash []byte
 	//8. 数据
 	Transactions []*Transaction
@@ -119,6 +119,14 @@ func Deserialize(data []byte) Block {
 	return block
 }
 func (block *Block) MakeMerkelRoot () []byte{
-	//TODO
-	return []byte{}
+	var info []byte
+	//var finalInfo [][]byte
+	for _, tx := range block.Transactions {
+		//将交易的哈希值拼接起来，再整体做哈希处理
+		info = append(info, tx.TXID...)
+		//finalInfo = [][]byte{tx.TXID}
+	}
+
+	hash := sha256.Sum256(info)
+	return hash[:]
 }

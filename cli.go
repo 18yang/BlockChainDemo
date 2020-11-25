@@ -12,12 +12,11 @@ type CLI struct {
 }
 
 const Usage = `
-	addBlock --data DATA       "添加区块"
-	printChain                 "正向打印区块链"
-	printChainR				   "反向打印区块链"
-	getBalance --address ADDRESS "获取指定地址的余额"
-	send FROM TO AMOUNT MINER DATA "由FROM转AMOUNT给TO,由MINER挖矿,同时写入DATA"
-	newWallet   "创建一个新的钱包(私钥公钥对)"
+	printChain  			"正向打印区块链"
+	printChainR 			"反向打印区块链"
+	getBalance --address ADDRESS    "获取指定地址的余额"
+	send FROM TO AMOUNT MINER DATA  "由FROM转AMOUNT给TO,由MINER挖矿,同时写入DATA"
+	newWallet   			"创建一个新的钱包(私钥公钥对)"
 	listAddresses "列举所有的钱包地址"
 `
 
@@ -35,24 +34,12 @@ func (cli *CLI) Run() {
 	cmd := args[1]
 	switch cmd {
 	//3. 执行相应的动作
-	case "addBlock":
-		//添加区块
-		fmt.Printf("添加区块\n")
-		if len(args) == 4 && args[2] == "--data" {
-			//获取命令的数据
-			data := args[3]
-			//添加区块
-			cli.AddBlock(data)
-		} else {
-			fmt.Printf("参数使用不当，请检查！")
-			fmt.Print(Usage)
-		}
 	case "printChain":
-		fmt.Println("正向打印区块链\n")
+		fmt.Printf("正向打印区块链\n")
 		cli.PrintBlockChain()
 	case "printChainR":
 		//打印区块
-		fmt.Println("反向打印区块链\n")
+		fmt.Printf("反向打印区块链\n")
 		cli.PrintBlockChainReverse()
 	case "getBalance":
 		fmt.Printf("获取余额...\n")
